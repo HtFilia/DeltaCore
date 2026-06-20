@@ -14,6 +14,7 @@ Examples:
 - Monotonicity of option price with respect to volatility.
 - Implied volatility recovery from a known Black-Scholes price.
 - Monte Carlo deterministic replay with an explicit seed.
+- Scenario repricing under documented deterministic shocks.
 - Input validation failures.
 
 ### Numerical regression tests
@@ -26,6 +27,7 @@ Examples:
 - Analytic Black-Scholes Greeks versus finite-difference Greeks with documented absolute bumps.
 - Implied volatility diagnostics for convergence and no-arbitrage failures.
 - Monte Carlo price within confidence interval for a fixed seed.
+- Scenario PnL signs and shocked prices against direct repricing.
 
 ### Integration tests
 
