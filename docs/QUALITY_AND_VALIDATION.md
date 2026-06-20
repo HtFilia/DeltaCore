@@ -15,6 +15,7 @@ Examples:
 - Implied volatility recovery from a known Black-Scholes price.
 - Monte Carlo deterministic replay with an explicit seed.
 - Scenario repricing under documented deterministic shocks.
+- Historical VaR and Expected Shortfall from deterministic PnL samples.
 - Input validation failures.
 
 ### Numerical regression tests
@@ -28,6 +29,7 @@ Examples:
 - Implied volatility diagnostics for convergence and no-arbitrage failures.
 - Monte Carlo price within confidence interval for a fixed seed.
 - Scenario PnL signs and shocked prices against direct repricing.
+- Historical VaR/ES against a documented empirical loss quantile and tail mean.
 
 ### Integration tests
 

@@ -23,10 +23,10 @@ that validate model behavior against known references and invariants.
 | Greeks | Analytic Black-Scholes delta, gamma, vega, theta, rho |
 | Calibration | Black-Scholes implied volatility with convergence diagnostics |
 | Monte Carlo | Black-Scholes European pricing with standard error and confidence interval |
-| Risk | Deterministic Black-Scholes scenario PnL and stress repricing |
+| Risk | Deterministic scenario PnL, historical VaR, and Expected Shortfall |
 | Validation | Closed-form fixtures, put-call parity, finite-difference Greeks |
 | Quality | Ruff formatting/linting, strict mypy, pytest |
-| Roadmap | VaR/ES |
+| Roadmap | Risk and analytics API endpoints |
 
 The distribution name is `deltacore`; the Python import namespace remains
 `derivatives_risk_engine` to keep the domain model explicit.
@@ -63,6 +63,10 @@ The goal is to make numerical finance work inspectable by a reviewer:
 - Scenario PnL applies absolute shifts to spot, volatility, continuous rates,
   dividend yield, and time to expiry, then reprices under Black-Scholes. PnL is
   `shocked_price - base_price`.
+- Historical VaR and Expected Shortfall consume deterministic PnL observations
+  where positive values are gains and negative values are losses. Loss is
+  `-PnL`; VaR is the conservative empirical loss quantile, and ES is the mean of
+  losses at or beyond that quantile.
 
 ## Quickstart
 
@@ -220,6 +224,19 @@ for result in results:
     print(result.scenario_name, result.pnl)
 ```
 
+Estimate historical VaR and Expected Shortfall:
+
+```python
+from derivatives_risk_engine.risk.var import historical_var_expected_shortfall
+
+pnls = (12.0, 7.0, 5.0, 2.0, 0.0, -1.0, -3.0, -8.0, -10.0, -20.0)
+
+result = historical_var_expected_shortfall(pnls, confidence_level=0.80)
+
+print(result.value_at_risk)  # 8.0
+print(result.expected_shortfall)  # 12.666666666666666
+```
+
 ## Try The API
 
 Run the service:
@@ -288,13 +305,14 @@ deterministic so they can be tested independently from transport concerns.
 | Implied volatility inversion | Recovers known vol and reports impossible prices |
 | Monte Carlo confidence interval | Fixed-seed simulation contains closed-form price |
 | Scenario PnL repricing | Shocked price equals direct Black-Scholes repricing |
+| Historical VaR/ES | Conservative loss quantile and tail-loss mean |
 | Expiry intrinsic value | Correct zero-time limiting behavior |
 | API integration smoke test | Request/response contract and service wiring |
 
 Current local result:
 
 ```text
-36 passed
+42 passed
 ```
 
 ## Roadmap
@@ -307,14 +325,16 @@ Current local result:
 - [x] Add implied-volatility solving with convergence diagnostics.
 - [x] Add Monte Carlo pricing with confidence intervals.
 - [x] Add scenario PnL and deterministic stress tests.
-- [ ] Add VaR and Expected Shortfall.
+- [x] Add VaR and Expected Shortfall.
+- [ ] Expose Greeks, implied volatility, scenario PnL, and VaR/ES through API routes.
 
 ## Project Boundaries
 
 DeltaCore is not a live trading system and does not ingest market data. The
 current implementation is a validated backend slice for vanilla European option
 pricing, Black-Scholes Greeks, Black-Scholes implied-volatility inversion, and
-Monte Carlo pricing with confidence intervals, plus deterministic scenario PnL.
-Exotic products, calibration surfaces, VaR/ES, and broader market-risk workflows
-are planned milestones and will be documented with explicit assumptions as they
-are implemented.
+Monte Carlo pricing with confidence intervals, plus deterministic scenario PnL
+and historical VaR/Expected Shortfall. Exotic products, calibration surfaces,
+API exposure for every analytics routine, and broader market-risk workflows are
+planned milestones and will be documented with explicit assumptions as they are
+implemented.
