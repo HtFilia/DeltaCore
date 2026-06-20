@@ -24,3 +24,26 @@ class BlackScholesMarket:
         require_finite("risk_free_rate", self.risk_free_rate)
         require_finite("dividend_yield", self.dividend_yield)
         require_positive("volatility", self.volatility)
+
+
+@dataclass(frozen=True, slots=True)
+class BachelierMarket:
+    """Bachelier market inputs.
+
+    Args:
+        spot: Current underlying spot; must be positive.
+        risk_free_rate: Continuously compounded annualized risk-free rate.
+        dividend_yield: Continuously compounded annualized dividend yield.
+        normal_volatility: Annualized normal volatility in price units; must be positive.
+    """
+
+    spot: float
+    risk_free_rate: float
+    dividend_yield: float
+    normal_volatility: float
+
+    def __post_init__(self) -> None:
+        require_positive("spot", self.spot)
+        require_finite("risk_free_rate", self.risk_free_rate)
+        require_finite("dividend_yield", self.dividend_yield)
+        require_positive("normal_volatility", self.normal_volatility)
