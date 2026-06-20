@@ -18,11 +18,12 @@ that validate model behavior against known references and invariants.
 
 | Area | Current status |
 | --- | --- |
-| Pricing | European call/put options under Black-Scholes |
+| Pricing | European call/put options under Black-Scholes and Bachelier |
 | API | FastAPI endpoints for `/health` and `/price/european` |
-| Validation | Closed-form fixtures, put-call parity, expiry intrinsic value |
+| Greeks | Analytic Black-Scholes delta, gamma, vega, theta, rho |
+| Validation | Closed-form fixtures, put-call parity, finite-difference Greeks |
 | Quality | Ruff formatting/linting, strict mypy, pytest |
-| Roadmap | Bachelier, Greeks, implied volatility, Monte Carlo, VaR/ES |
+| Roadmap | Implied volatility, Monte Carlo, VaR/ES |
 
 The distribution name is `deltacore`; the Python import namespace remains
 `derivatives_risk_engine` to keep the domain model explicit.
@@ -39,6 +40,17 @@ The goal is to make numerical finance work inspectable by a reviewer:
 - pricing functions are deterministic and side-effect free;
 - API contracts are typed with Pydantic;
 - tests favor references and invariants over visual demos.
+
+## Model Conventions
+
+- Black-Scholes uses lognormal spot dynamics, continuous risk-free and dividend
+  rates, annualized volatility, and year-fraction time to expiry.
+- Bachelier uses a forward normal convention with
+  `F = S exp((r - q)T)`, risk-free discounting, and annualized normal volatility
+  in price units.
+- Black-Scholes Greeks are analytic. Delta and gamma are spot-unit sensitivities,
+  vega and rho use absolute volatility/rate bumps, and theta is calendar-time
+  decay per year, equivalent to `-dV/dT`.
 
 ## Quickstart
 
@@ -77,6 +89,44 @@ market = BlackScholesMarket(
 
 price = black_scholes_price(option, market)
 print(price)  # 10.450583572185565
+```
+
+Use the Bachelier normal model:
+
+```python
+from derivatives_risk_engine.core.instruments import EuropeanOption
+from derivatives_risk_engine.core.market import BachelierMarket
+from derivatives_risk_engine.models.bachelier import bachelier_price
+
+option = EuropeanOption(option_type="call", strike=100.0, time_to_expiry=1.0)
+market = BachelierMarket(
+    spot=100.0,
+    risk_free_rate=0.05,
+    dividend_yield=0.0,
+    normal_volatility=15.0,
+)
+
+price = bachelier_price(option, market)
+print(price)  # 8.460134478825838
+```
+
+Compute Black-Scholes Greeks:
+
+```python
+from derivatives_risk_engine.core.instruments import EuropeanOption
+from derivatives_risk_engine.core.market import BlackScholesMarket
+from derivatives_risk_engine.risk.greeks import black_scholes_greeks
+
+option = EuropeanOption(option_type="call", strike=100.0, time_to_expiry=1.0)
+market = BlackScholesMarket(
+    spot=100.0,
+    risk_free_rate=0.05,
+    dividend_yield=0.0,
+    volatility=0.20,
+)
+
+greeks = black_scholes_greeks(option, market)
+print(greeks.delta, greeks.vega)
 ```
 
 ## Try The API
@@ -141,14 +191,16 @@ deterministic so they can be tested independently from transport concerns.
 | --- | --- |
 | Closed-form call fixture | Black-Scholes call value under continuous rates |
 | Closed-form put fixture | Put sign convention and discounting |
-| Put-call parity with dividends | Internal consistency across calls and puts |
+| Bachelier fixtures | Normal-model prices under forward-discounted convention |
+| Put-call parity with dividends | Internal consistency across calls and puts in both models |
+| Analytic Greeks vs finite difference | Delta, gamma, vega, theta, and rho conventions |
 | Expiry intrinsic value | Correct zero-time limiting behavior |
 | API integration smoke test | Request/response contract and service wiring |
 
 Current local result:
 
 ```text
-6 passed
+17 passed
 ```
 
 ## Roadmap
@@ -156,8 +208,8 @@ Current local result:
 - [x] Bootstrap Python package, test layout, linting, typing, and FastAPI app.
 - [x] Implement Black-Scholes European call/put pricing.
 - [x] Validate with closed-form fixtures and put-call parity.
-- [ ] Add Bachelier pricing for normal-volatility workflows.
-- [ ] Add analytic and finite-difference Greeks.
+- [x] Add Bachelier pricing for normal-volatility workflows.
+- [x] Add analytic and finite-difference Greeks.
 - [ ] Add implied-volatility solving with convergence diagnostics.
 - [ ] Add Monte Carlo pricing with confidence intervals.
 - [ ] Add scenario PnL, VaR, Expected Shortfall, and stress tests.
@@ -166,6 +218,6 @@ Current local result:
 
 DeltaCore is not a live trading system and does not ingest market data. The
 current implementation is a validated backend slice for vanilla European option
-pricing. Exotic products, calibration surfaces, and market-risk metrics are
-planned milestones and will be documented with explicit assumptions as they are
-implemented.
+pricing and Black-Scholes Greeks. Exotic products, calibration surfaces, and
+market-risk metrics are planned milestones and will be documented with explicit
+assumptions as they are implemented.

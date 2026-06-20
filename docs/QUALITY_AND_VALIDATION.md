@@ -9,6 +9,7 @@ Fast tests for formulas, schemas, and pure functions.
 Examples:
 
 - Black-Scholes call/put values against known fixtures.
+- Bachelier call/put values against known forward-normal fixtures.
 - Put-call parity.
 - Monotonicity of option price with respect to volatility.
 - Input validation failures.
@@ -20,7 +21,7 @@ Tests that protect against accidental changes in numerical behavior.
 Examples:
 
 - Fixed option grids with expected prices.
-- Analytic Greeks versus finite-difference Greeks.
+- Analytic Black-Scholes Greeks versus finite-difference Greeks with documented absolute bumps.
 - Monte Carlo price within confidence interval for a fixed seed.
 
 ### Integration tests

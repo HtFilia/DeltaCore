@@ -4,12 +4,7 @@ import math
 
 from derivatives_risk_engine.core.instruments import EuropeanOption
 from derivatives_risk_engine.core.market import BlackScholesMarket
-
-_SQRT_TWO = math.sqrt(2.0)
-
-
-def _standard_normal_cdf(value: float) -> float:
-    return 0.5 * math.erfc(-value / _SQRT_TWO)
+from derivatives_risk_engine.numerics.normal import standard_normal_cdf
 
 
 def black_scholes_price(option: EuropeanOption, market: BlackScholesMarket) -> float:
@@ -37,9 +32,9 @@ def black_scholes_price(option: EuropeanOption, market: BlackScholesMarket) -> f
     discounted_strike = option.strike * math.exp(-market.risk_free_rate * option.time_to_expiry)
 
     if option.option_type == "call":
-        return discounted_spot * _standard_normal_cdf(d1) - discounted_strike * (
-            _standard_normal_cdf(d2)
+        return discounted_spot * standard_normal_cdf(d1) - discounted_strike * (
+            standard_normal_cdf(d2)
         )
-    return discounted_strike * _standard_normal_cdf(-d2) - discounted_spot * (
-        _standard_normal_cdf(-d1)
+    return discounted_strike * standard_normal_cdf(-d2) - discounted_spot * (
+        standard_normal_cdf(-d1)
     )
