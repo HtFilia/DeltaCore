@@ -22,9 +22,10 @@ that validate model behavior against known references and invariants.
 | API | FastAPI endpoints for `/health` and `/price/european` |
 | Greeks | Analytic Black-Scholes delta, gamma, vega, theta, rho |
 | Calibration | Black-Scholes implied volatility with convergence diagnostics |
+| Monte Carlo | Black-Scholes European pricing with standard error and confidence interval |
 | Validation | Closed-form fixtures, put-call parity, finite-difference Greeks |
 | Quality | Ruff formatting/linting, strict mypy, pytest |
-| Roadmap | Monte Carlo, VaR/ES |
+| Roadmap | Scenario PnL, VaR/ES |
 
 The distribution name is `deltacore`; the Python import namespace remains
 `derivatives_risk_engine` to keep the domain model explicit.
@@ -55,6 +56,9 @@ The goal is to make numerical finance work inspectable by a reviewer:
 - Black-Scholes implied volatility uses bounded one-dimensional root finding.
   Results report convergence, objective residual, iteration count, volatility
   bounds, and a structured failure reason when calibration is not possible.
+- Monte Carlo pricing uses the risk-neutral Black-Scholes terminal distribution,
+  explicit random seeds, discounted payoff means, standard error, and a
+  normal-approximation confidence interval.
 
 ## Quickstart
 
@@ -155,6 +159,32 @@ print(result.implied_volatility)  # 0.20
 print(result.diagnostics.converged)
 ```
 
+Run deterministic Monte Carlo pricing:
+
+```python
+from derivatives_risk_engine.core.instruments import EuropeanOption
+from derivatives_risk_engine.core.market import BlackScholesMarket
+from derivatives_risk_engine.numerics.monte_carlo import monte_carlo_black_scholes_price
+
+option = EuropeanOption(option_type="call", strike=100.0, time_to_expiry=1.0)
+market = BlackScholesMarket(
+    spot=100.0,
+    risk_free_rate=0.05,
+    dividend_yield=0.0,
+    volatility=0.20,
+)
+
+result = monte_carlo_black_scholes_price(
+    option=option,
+    market=market,
+    num_paths=50_000,
+    seed=7,
+)
+
+print(result.price, result.standard_error)
+print(result.confidence_interval_low, result.confidence_interval_high)
+```
+
 ## Try The API
 
 Run the service:
@@ -221,13 +251,14 @@ deterministic so they can be tested independently from transport concerns.
 | Put-call parity with dividends | Internal consistency across calls and puts in both models |
 | Analytic Greeks vs finite difference | Delta, gamma, vega, theta, and rho conventions |
 | Implied volatility inversion | Recovers known vol and reports impossible prices |
+| Monte Carlo confidence interval | Fixed-seed simulation contains closed-form price |
 | Expiry intrinsic value | Correct zero-time limiting behavior |
 | API integration smoke test | Request/response contract and service wiring |
 
 Current local result:
 
 ```text
-24 passed
+29 passed
 ```
 
 ## Roadmap
@@ -238,14 +269,14 @@ Current local result:
 - [x] Add Bachelier pricing for normal-volatility workflows.
 - [x] Add analytic and finite-difference Greeks.
 - [x] Add implied-volatility solving with convergence diagnostics.
-- [ ] Add Monte Carlo pricing with confidence intervals.
+- [x] Add Monte Carlo pricing with confidence intervals.
 - [ ] Add scenario PnL, VaR, Expected Shortfall, and stress tests.
 
 ## Project Boundaries
 
 DeltaCore is not a live trading system and does not ingest market data. The
 current implementation is a validated backend slice for vanilla European option
-pricing, Black-Scholes Greeks, and Black-Scholes implied-volatility inversion.
-Exotic products, calibration surfaces, and market-risk metrics are planned
-milestones and will be documented with explicit assumptions as they are
-implemented.
+pricing, Black-Scholes Greeks, Black-Scholes implied-volatility inversion, and
+Monte Carlo pricing with confidence intervals. Exotic products, calibration
+surfaces, and market-risk metrics are planned milestones and will be documented
+with explicit assumptions as they are implemented.
