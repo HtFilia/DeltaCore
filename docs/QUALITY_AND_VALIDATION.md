@@ -13,6 +13,7 @@ Examples:
 - Put-call parity.
 - Monotonicity of option price with respect to volatility.
 - Implied volatility recovery from a known Black-Scholes price.
+- Monte Carlo deterministic replay with an explicit seed.
 - Input validation failures.
 
 ### Numerical regression tests
