@@ -12,6 +12,7 @@ Examples:
 - Bachelier call/put values against known forward-normal fixtures.
 - Put-call parity.
 - Monotonicity of option price with respect to volatility.
+- Implied volatility recovery from a known Black-Scholes price.
 - Input validation failures.
 
 ### Numerical regression tests
@@ -22,6 +23,7 @@ Examples:
 
 - Fixed option grids with expected prices.
 - Analytic Black-Scholes Greeks versus finite-difference Greeks with documented absolute bumps.
+- Implied volatility diagnostics for convergence and no-arbitrage failures.
 - Monte Carlo price within confidence interval for a fixed seed.
 
 ### Integration tests
