@@ -1,11 +1,14 @@
 from dataclasses import dataclass
+from typing import Literal
 
 from derivatives_risk_engine.core.instruments import EuropeanOption, OptionType
 from derivatives_risk_engine.core.market import BlackScholesMarket
 from derivatives_risk_engine.models.black_scholes import black_scholes_price
 
-BLACK_SCHOLES_MODEL = "black_scholes"
-PRICING_CONVENTION = "continuous_rates_annualized_volatility"
+BLACK_SCHOLES_MODEL: Literal["black_scholes"] = "black_scholes"
+PRICING_CONVENTION: Literal["continuous_rates_annualized_volatility"] = (
+    "continuous_rates_annualized_volatility"
+)
 
 
 @dataclass(frozen=True, slots=True)

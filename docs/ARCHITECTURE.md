@@ -12,6 +12,7 @@
 ```text
 api/
   main.py                # FastAPI app factory
+  routes_demo.py         # browser demo route
   routes_pricing.py      # pricing routes
   routes_risk.py         # risk routes
   schemas.py             # Pydantic request/response contracts
@@ -61,6 +62,8 @@ Use service functions for backend logic:
 price_european_option(request: EuropeanPricingRequest) -> EuropeanPricingResult
 compute_european_greeks(request: EuropeanGreekRequest) -> EuropeanGreekResult
 solve_implied_volatility(request: ImpliedVolRequest) -> ImpliedVolResult
+compute_black_scholes_scenario_pnl(...) -> tuple[ScenarioPnLResult, ...]
+compute_historical_var_expected_shortfall(...) -> HistoricalRiskResult
 ```
 
 ## Numerical reproducibility

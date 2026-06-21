@@ -47,6 +47,8 @@ Create DeltaCore: a Python backend that prices vanilla derivatives, computes Gre
 - `/greeks/european`
 - `/implied-volatility`
 - `/risk/scenario-pnl`
+- `/risk/historical-var`
+- `/demo` for a lightweight browser demonstration backed by API calls
 
 ## Out of scope for the first version
 
