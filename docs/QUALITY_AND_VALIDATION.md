@@ -38,6 +38,11 @@ Tests that call API routes via FastAPI test client.
 Examples:
 
 - `/price/european` returns expected schema.
+- `/greeks/european` returns analytic Black-Scholes Greeks.
+- `/implied-volatility` returns calibration diagnostics.
+- `/risk/scenario-pnl` returns deterministic scenario repricing results.
+- `/risk/historical-var` returns historical VaR and Expected Shortfall.
+- `/demo` serves the browser demonstration page.
 - Invalid request returns structured validation error.
 
 ## Numerical validation checklist

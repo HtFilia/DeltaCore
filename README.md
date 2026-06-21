@@ -19,14 +19,15 @@ that validate model behavior against known references and invariants.
 | Area | Current status |
 | --- | --- |
 | Pricing | European call/put options under Black-Scholes and Bachelier |
-| API | FastAPI endpoints for `/health` and `/price/european` |
+| API | FastAPI endpoints for pricing, Greeks, implied volatility, scenario PnL, and VaR/ES |
+| Demo | Browser demo at `/demo`, backed by live API calls |
 | Greeks | Analytic Black-Scholes delta, gamma, vega, theta, rho |
 | Calibration | Black-Scholes implied volatility with convergence diagnostics |
 | Monte Carlo | Black-Scholes European pricing with standard error and confidence interval |
 | Risk | Deterministic scenario PnL, historical VaR, and Expected Shortfall |
 | Validation | Closed-form fixtures, put-call parity, finite-difference Greeks |
 | Quality | Ruff formatting/linting, strict mypy, pytest |
-| Roadmap | Risk and analytics API endpoints |
+| Roadmap | Monte Carlo API endpoint and richer demo views |
 
 The distribution name is `deltacore`; the Python import namespace remains
 `derivatives_risk_engine` to keep the domain model explicit.
@@ -245,6 +246,24 @@ Run the service:
 uv run uvicorn derivatives_risk_engine.api.main:app --reload
 ```
 
+Open the browser demo:
+
+```text
+http://127.0.0.1:8000/demo
+```
+
+Current endpoints:
+
+```text
+GET  /health
+GET  /demo
+POST /price/european
+POST /greeks/european
+POST /implied-volatility
+POST /risk/scenario-pnl
+POST /risk/historical-var
+```
+
 <details>
 <summary>POST /price/european</summary>
 
@@ -307,12 +326,12 @@ deterministic so they can be tested independently from transport concerns.
 | Scenario PnL repricing | Shocked price equals direct Black-Scholes repricing |
 | Historical VaR/ES | Conservative loss quantile and tail-loss mean |
 | Expiry intrinsic value | Correct zero-time limiting behavior |
-| API integration smoke test | Request/response contract and service wiring |
+| API integration smoke test | Pricing, Greeks, implied vol, risk endpoints, and demo page wiring |
 
 Current local result:
 
 ```text
-42 passed
+47 passed
 ```
 
 ## Roadmap
@@ -326,7 +345,9 @@ Current local result:
 - [x] Add Monte Carlo pricing with confidence intervals.
 - [x] Add scenario PnL and deterministic stress tests.
 - [x] Add VaR and Expected Shortfall.
-- [ ] Expose Greeks, implied volatility, scenario PnL, and VaR/ES through API routes.
+- [x] Expose Greeks, implied volatility, scenario PnL, and VaR/ES through API routes.
+- [x] Add a rudimentary browser demo backed by the FastAPI endpoints.
+- [ ] Add Monte Carlo pricing to the API and enrich the demo with simulation uncertainty.
 
 ## Project Boundaries
 
@@ -334,7 +355,8 @@ DeltaCore is not a live trading system and does not ingest market data. The
 current implementation is a validated backend slice for vanilla European option
 pricing, Black-Scholes Greeks, Black-Scholes implied-volatility inversion, and
 Monte Carlo pricing with confidence intervals, plus deterministic scenario PnL
-and historical VaR/Expected Shortfall. Exotic products, calibration surfaces,
-API exposure for every analytics routine, and broader market-risk workflows are
-planned milestones and will be documented with explicit assumptions as they are
-implemented.
+and historical VaR/Expected Shortfall. A lightweight browser demo is available
+at `/demo` and calls the same FastAPI endpoints exposed to external clients.
+Exotic products, calibration surfaces, Monte Carlo API exposure, and broader
+market-risk workflows are planned milestones and will be documented with
+explicit assumptions as they are implemented.
