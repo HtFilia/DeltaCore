@@ -9,7 +9,6 @@ Create DeltaCore: a Python backend that prices vanilla derivatives, computes Gre
 - Quant researchers who want a readable pricing sandbox.
 - Quant developers who want a clean Python backend example.
 - Risk analysts who need reproducible stress-testing examples.
-- Recruiters or technical interviewers assessing quantitative software maturity.
 
 ## In scope
 
