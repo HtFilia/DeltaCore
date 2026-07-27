@@ -10,9 +10,10 @@
 Production-minded Python backend for derivatives pricing, Greeks, volatility
 calibration, and market-risk analytics.
 
-DeltaCore is built as a focused quantitative engineering portfolio project: pure
-pricing kernels, typed API boundaries, explicit numerical assumptions, and tests
-that validate model behavior against known references and invariants.
+DeltaCore provides deterministic pricing and risk components for vanilla
+derivatives workflows. Pure pricing kernels sit behind typed API boundaries,
+with explicit model conventions and numerical checks against known references
+and invariants.
 
 ## At A Glance
 
@@ -32,13 +33,14 @@ that validate model behavior against known references and invariants.
 The distribution name is `deltacore`; the Python import namespace remains
 `derivatives_risk_engine` to keep the domain model explicit.
 
-## Why It Exists
+## Use Case
 
-Many quant projects start as notebooks and never develop production-grade
-boundaries. DeltaCore is designed the other way around: small, validated pricing
-and risk components first, then API orchestration around them.
+Pricing services need model behavior that remains inspectable when numerical
+logic is exposed through an API. DeltaCore separates pure quantitative kernels
+from transport and orchestration so pricing, calibration, and risk calculations
+can be validated independently and reused consistently.
 
-The goal is to make numerical finance work inspectable by a reviewer:
+The implementation emphasizes:
 
 - formulas and conventions are documented in code and tests;
 - pricing functions are deterministic and side-effect free;
@@ -327,12 +329,6 @@ deterministic so they can be tested independently from transport concerns.
 | Historical VaR/ES | Conservative loss quantile and tail-loss mean |
 | Expiry intrinsic value | Correct zero-time limiting behavior |
 | API integration smoke test | Pricing, Greeks, implied vol, risk endpoints, and demo page wiring |
-
-Current local result:
-
-```text
-47 passed
-```
 
 ## Roadmap
 
