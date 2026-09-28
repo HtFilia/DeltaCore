@@ -1,5 +1,7 @@
 # DeltaCore
 
+![Project overview — Lucas Lebihan, Quantitative Engineer](docs/assets/project-header.png)
+
 [![CI](https://github.com/HtFilia/DeltaCore/actions/workflows/ci.yml/badge.svg)](https://github.com/HtFilia/DeltaCore/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![FastAPI](https://img.shields.io/badge/api-FastAPI-009688)
