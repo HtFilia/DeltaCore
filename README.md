@@ -17,6 +17,24 @@ derivatives workflows. Pure pricing kernels sit behind typed API boundaries,
 with explicit model conventions and numerical checks against known references
 and invariants.
 
+## Start reviewing here
+
+Problem: make European-option pricing and risk calculations inspectable through
+pure Python kernels and typed HTTP boundaries.
+
+- Workflow: explicit contract/market inputs → pure model/numerical functions →
+  pricing/Greek/IV/risk services → FastAPI. [Architecture](docs/ARCHITECTURE.md).
+- Hard decision: keep domain functions independent of HTTP, with documented units
+  and structured numerical failures. [Validation](docs/QUALITY_AND_VALIDATION.md).
+- Review the [pure Black–Scholes kernel](src/derivatives_risk_engine/models/black_scholes.py),
+  [finite-difference Greek checks](tests/unit/test_black_scholes_greeks.py),
+  [scalar IV diagnostics](tests/unit/test_implied_volatility.py) and
+  [Monte Carlo uncertainty](tests/unit/test_monte_carlo.py).
+- Limit: vanilla synthetic examples; scalar implied volatility is not volatility
+  surface calibration. No market-data integration or unmeasured performance claim.
+- Quick run: `uv sync --extra dev && uv run pytest`; run
+  `uv run uvicorn derivatives_risk_engine.api.main:app --reload` for the API/demo.
+
 ## At A Glance
 
 | Area | Current status |
