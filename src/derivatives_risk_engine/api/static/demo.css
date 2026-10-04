@@ -4,7 +4,7 @@
       --bg: #f5f7f8;
       --panel: #ffffff;
       --ink: #172126;
-      --muted: #68757d;
+      --muted: #5f6c74;
       --line: #d9e0e3;
       --accent: #006d77;
       --accent-dark: #004e56;
@@ -27,7 +27,7 @@
     }
 
     .shell {
-      width: min(1180px, calc(100vw - 32px));
+      width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
       padding: 24px 0 32px;
     }
@@ -268,3 +268,5 @@ summary {cursor:pointer;font-weight:600;padding:14px 0}details {margin-top:8px}
 .track {background:#e3eaee;border-radius:4px;height:14px;overflow:hidden}.fill {height:100%;background:#007782}.fill.loss {background:#b23745}
 #status {color:#526471}#greeks {line-height:1.8}.curve {min-width:0}.curve svg {min-width:0}.metrics .panel {padding:16px}
 @media(max-width:860px){.workspace {grid-template-columns:1fr}.metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.question {font-size:24px}.metric strong{font-size:23px}.shell {padding:16px}.contribution {grid-template-columns:95px minmax(0,1fr) 80px}.curve text{font-size:11px}}
+@media(max-width:860px){.metric strong{font-size:18px}}
+@media(max-width:360px){.metrics{grid-template-columns:1fr}}
