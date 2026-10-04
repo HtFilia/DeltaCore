@@ -116,6 +116,7 @@ dependencies = [
     { name = "numpy" },
     { name = "pydantic" },
     { name = "scipy" },
+    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
@@ -124,7 +125,6 @@ dev = [
     { name = "mypy" },
     { name = "pytest" },
     { name = "ruff" },
-    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -137,7 +137,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.5" },
     { name = "scipy", specifier = ">=1.13" },
-    { name = "uvicorn", marker = "extra == 'dev'", specifier = ">=0.30" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 provides-extras = ["dev"]
 

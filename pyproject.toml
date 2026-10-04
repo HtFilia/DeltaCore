@@ -13,6 +13,7 @@ dependencies = [
   "numpy>=1.26",
   "pydantic>=2.7",
   "scipy>=1.13",
+  "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]
@@ -21,7 +22,6 @@ dev = [
   "mypy>=1.10",
   "pytest>=8.2",
   "ruff>=0.5",
-  "uvicorn>=0.30",
 ]
 
 [tool.hatch.build.targets.wheel]
