@@ -145,3 +145,21 @@ class HistoricalVarResponse(BaseModel):
     num_observations: int
     tail_observations: int
     quantile_index: int
+
+
+class AttributionShockRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    name: str = Field(default="Custom shock", max_length=64)
+    spot_shift: float = Field(default=0, ge=-1e7, le=1e7)
+    volatility_shift: float = Field(default=0, ge=-10, le=10)
+    elapsed_years: float = Field(default=0, ge=0, le=100)
+
+
+class AttributionRequest(EuropeanPricingRequest):
+    spot: float = Field(gt=0, le=1e7)
+    strike: float = Field(gt=0, le=1e7)
+    time_to_expiry: float = Field(gt=0, le=100)
+    volatility: float = Field(gt=0, le=10)
+    risk_free_rate: float = Field(ge=-2, le=2)
+    dividend_yield: float = Field(default=0, ge=-2, le=2)
+    shocks: list[AttributionShockRequest] = Field(min_length=1, max_length=16)

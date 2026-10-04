@@ -6,6 +6,11 @@ from derivatives_risk_engine.calibration.implied_vol import (
 )
 from derivatives_risk_engine.core.instruments import EuropeanOption
 from derivatives_risk_engine.core.market import BlackScholesMarket
+from derivatives_risk_engine.risk.attribution import (
+    AttributionResult,
+    AttributionShock,
+    attribute_scenario,
+)
 from derivatives_risk_engine.risk.greeks import BlackScholesGreeks, black_scholes_greeks
 from derivatives_risk_engine.risk.scenario import (
     MarketShock,
@@ -61,3 +66,12 @@ def compute_historical_var_expected_shortfall(
 ) -> HistoricalRiskResult:
     """Estimate historical VaR and Expected Shortfall from PnL observations."""
     return historical_var_expected_shortfall(pnls=pnls, confidence_level=confidence_level)
+
+
+def compute_scenario_attribution(
+    option: EuropeanOption,
+    market: BlackScholesMarket,
+    shocks: tuple[AttributionShock, ...],
+) -> tuple[AttributionResult, ...]:
+    """Compute local contributions while retaining exact scenario repricing."""
+    return tuple(attribute_scenario(option, market, shock) for shock in shocks)

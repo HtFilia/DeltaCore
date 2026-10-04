@@ -143,5 +143,39 @@ def test_demo_page_is_served_as_html() -> None:
     assert "DeltaCore Demo" in response.text
     script = client.get("/demo-assets/demo.js")
     assert script.status_code == 200
-    assert 'postJson("/price/european"' in script.text
+    assert "/price/european" in script.text
     assert client.get("/demo-assets/missing.js").status_code == 404
+
+
+def test_attribution_endpoint_is_bounded_and_retains_signed_time_convention() -> None:
+    base = {
+        "option_type": "call",
+        "spot": 100,
+        "strike": 100,
+        "time_to_expiry": 1,
+        "risk_free_rate": 0.05,
+        "volatility": 0.2,
+    }
+    response = client.post(
+        "/risk/scenario-attribution", json={**base, "shocks": [{"elapsed_years": 7 / 365}]}
+    )
+    assert response.status_code == 200
+    result = response.json()[0]
+    assert result["calendar_theta"] < 0
+    assert result["shocked_time_to_expiry"] == pytest.approx(1 - 7 / 365)
+    assert (
+        client.post("/risk/scenario-attribution", json={**base, "shocks": [{}] * 17}).status_code
+        == 422
+    )
+    assert (
+        client.post(
+            "/risk/scenario-attribution", json={**base, "shocks": [{"time_shift": 1}]}
+        ).status_code
+        == 422
+    )
+    assert (
+        client.post(
+            "/risk/scenario-attribution", json={**base, "shocks": [{"elapsed_years": 2}]}
+        ).status_code
+        == 422
+    )

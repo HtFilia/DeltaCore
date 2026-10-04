@@ -254,4 +254,17 @@
         width: 100%;
       }
     }
-  
+  /* Keep the original teal, light panels and system font. */
+header {gap:16px;flex-wrap:wrap} nav {line-height:1.8} a {color:#006872}
+.eyebrow {font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#526471}
+.question {font-size:28px;margin:24px 0 8px}.workspace {display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.4fr);gap:18px;margin:18px 0}
+.metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.metric strong {overflow-wrap:anywhere;font-size:26px}.controls {padding:20px}.controls h2 {margin-top:0}
+.presets {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px} button {cursor:pointer}
+.presets button {width:auto;margin:0;padding:10px 12px} #reset {margin:12px 0}
+summary {cursor:pointer;font-weight:600;padding:14px 0}details {margin-top:8px}
+.explanation,.supporting,.evidence {padding:20px;margin:18px 0}.error {color:#a72532}
+.contributions {display:grid;gap:10px;margin:20px 0}.contribution {display:grid;grid-template-columns:115px minmax(0,1fr) 95px;gap:10px;align-items:center}
+.track {background:#e3eaee;border-radius:4px;height:14px;overflow:hidden}.fill {height:100%;background:#007782}.fill.loss {background:#b23745}
+#status {color:#526471}#greeks {line-height:1.8}.curve {min-width:0}.curve svg {min-width:0}.metrics .panel {padding:16px}
+@media(max-width:860px){.workspace {grid-template-columns:1fr}.metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.question {font-size:24px}.metric strong{font-size:23px}.shell {padding:16px}.contribution {grid-template-columns:95px minmax(0,1fr) 80px}.curve text{font-size:11px}}
