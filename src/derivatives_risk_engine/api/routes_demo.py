@@ -117,6 +117,8 @@ DEMO_HTML = """<!doctype html>
       font-size: 14px;
     }
 
+    input[type="range"] { accent-color: var(--accent); }
+
     textarea {
       min-height: 120px;
       resize: vertical;
@@ -237,6 +239,17 @@ DEMO_HTML = """<!doctype html>
       font-size: 13px;
     }
 
+    .intro { color: var(--muted); line-height: 1.5; }
+    .curve { padding: 16px; }
+    .curve h2 { margin: 0 0 8px; font-size: 18px; }
+    .curve svg { display: block; width: 100%; height: auto; }
+    .curve path { fill: none; stroke: var(--accent); stroke-width: 3; }
+    .curve line { stroke: var(--line); }
+    .curve text { fill: var(--muted); font-size: 12px; }
+    .curve circle { fill: var(--accent); }
+    .curve table { min-width: 0; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
     @media (max-width: 860px) {
       main,
       .metrics {
@@ -258,11 +271,13 @@ DEMO_HTML = """<!doctype html>
   <div class="shell">
     <header>
       <h1>DeltaCore Demo</h1>
-      <div class="status" id="status">idle</div>
+      <div class="status" id="status" role="status" aria-live="polite">idle</div>
     </header>
 
     <main>
       <section class="panel controls" aria-label="Inputs">
+        <p class="intro">Explore a European option under Black-Scholes. Change spot or volatility
+          to update prices and scenarios. Synthetic inputs; no live market data.</p>
         <div class="grid">
           <label>Type
             <select id="optionType">
@@ -270,23 +285,29 @@ DEMO_HTML = """<!doctype html>
               <option value="put">Put</option>
             </select>
           </label>
-          <label>Spot
-            <input id="spot" type="number" step="0.01" value="100">
+          <label>Spot (currency units)
+            <input id="spot" type="number" min="0.01" step="0.01" value="100">
+          </label>
+          <label class="wide">Explore spot (10 to 200)
+            <input id="spotSlider" type="range" min="10" max="200" step="1" value="100">
           </label>
           <label>Strike
             <input id="strike" type="number" step="0.01" value="100">
           </label>
-          <label>Expiry
-            <input id="expiry" type="number" step="0.01" value="1">
+          <label>Expiry (years)
+            <input id="expiry" type="number" min="0.0001" step="0.01" value="1">
           </label>
-          <label>Rate
+          <label>Rate (annual decimal)
             <input id="rate" type="number" step="0.001" value="0.05">
           </label>
-          <label>Dividend
+          <label>Dividend (annual decimal)
             <input id="dividend" type="number" step="0.001" value="0">
           </label>
-          <label>Volatility
+          <label>Volatility (annual decimal)
             <input id="volatility" type="number" step="0.01" value="0.20">
+          </label>
+          <label class="wide">Explore volatility (1% to 100%)
+            <input id="volSlider" type="range" min="0.01" max="1" step="0.01" value="0.20">
           </label>
           <label>Confidence
             <input id="confidence" type="number" step="0.01" value="0.80">
@@ -309,13 +330,28 @@ DEMO_HTML = """<!doctype html>
             <strong id="delta">-</strong>
           </div>
           <div class="metric">
-            <span>Implied vol</span>
+            <span>Recovered input volatility</span>
             <strong id="impliedVol">-</strong>
           </div>
           <div class="metric negative">
             <span>VaR / ES</span>
             <strong id="varEs">-</strong>
           </div>
+        </section>
+
+        <section class="panel curve" aria-label="Price sensitivity">
+          <h2>Option price versus spot</h2>
+          <p class="intro">Nine scenarios from 80% to 120% of the selected spot.
+            Other inputs stay fixed.
+            The dot marks the selected spot. Prices use the same backend model as the metrics.</p>
+          <svg id="priceCurve" viewBox="0 0 640 250" role="img"
+            aria-label="Option price versus spot; numerical values in the table below"></svg>
+          <details><summary>Inspect curve values</summary>
+            <div class="table-wrap" role="region" aria-label="Curve values" tabindex="0">
+              <table><thead><tr><th>Spot</th><th>Option price</th></tr></thead>
+                <tbody id="curveRows"></tbody></table>
+            </div>
+          </details>
         </section>
 
         <section class="panel">
@@ -369,11 +405,11 @@ DEMO_HTML = """<!doctype html>
         .map(Number);
     }
 
-    async function postJson(path, payload) {
+    async function postJson(path, payload, signal) {
       const response = await fetch(path, {
         method: "POST",
         headers: {"content-type": "application/json"},
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload), signal
       });
       if (!response.ok) {
         const details = await response.text();
@@ -382,25 +418,84 @@ DEMO_HTML = """<!doctype html>
       return response.json();
     }
 
+    let revision = 0;
+    let activeRequest;
+    let updateTimer;
+
+    function clearResults() {
+      curvePoints = [];
+      ["price", "delta", "impliedVol", "varEs"].forEach(id => byId(id).textContent = "—");
+      ["scenarioRows", "curveRows", "priceCurve"].forEach(id => byId(id).replaceChildren());
+    }
+
+    let curvePoints = [];
+    function drawCurve(points) {
+      curvePoints = points;
+      if (!points.length) return;
+      const width = Math.max(280, byId("priceCurve").clientWidth);
+      byId("priceCurve").setAttribute("viewBox", `0 0 ${width} 250`);
+      const minX = points[0].shocked_spot;
+      const maxX = points[points.length - 1].shocked_spot;
+      const maxY = Math.max(...points.map(point => point.shocked_price), 0.01) * 1.05;
+      const x = value => 62 + (value - minX) / (maxX - minX) * (width - 80);
+      const y = value => 210 - value / maxY * 190;
+      const path = points.map((point, i) =>
+        `${i ? "L" : "M"} ${x(point.shocked_spot)} ${y(point.shocked_price)}`).join(" ");
+      byId("priceCurve").innerHTML = `
+        <line x1="62" y1="20" x2="62" y2="210" />
+        <line x1="62" y1="210" x2="${width - 18}" y2="210" />
+        <text x="8" y="16">Price</text><text x="12" y="210">0</text>
+        <text x="8" y="35">${maxY.toFixed(2)}</text>
+        <text x="62" y="230">${format(minX)}</text>
+        <text x="${width - 18}" y="230" text-anchor="end">${format(maxX)}</text>
+        <text x="${width / 2}" y="248" text-anchor="middle">Spot (currency units)</text>
+        <path d="${path}" />
+        <circle cx="${x(points[4].shocked_spot)}" cy="${y(points[4].shocked_price)}" r="5" />`;
+      byId("curveRows").innerHTML = points.map(point => `<tr>
+        <td>${format(point.shocked_spot)}</td><td>${format(point.shocked_price)}</td></tr>`).join("");
+    }
+
     async function runAnalytics() {
+      clearTimeout(updateTimer);
+      activeRequest?.abort();
+      activeRequest = new AbortController();
+      const signal = activeRequest.signal;
+      const current = ++revision;
+      clearResults();
       byId("runButton").disabled = true;
       byId("status").textContent = "running";
       byId("log").textContent = "";
 
       try {
         const base = basePayload();
-        const priceResponse = await fetch("/price/european", {
-          method: "POST",
-          headers: {"content-type": "application/json"},
-          body: JSON.stringify(base)
-        });
-        if (!priceResponse.ok) {
-          const details = await priceResponse.text();
-          throw new Error(`/price/european: ${priceResponse.status} ${details}`);
+        const pnls = parsePnls();
+        const confidence = numberValue("confidence");
+        const numericInputs = ["spot", "strike", "expiry", "rate", "dividend",
+          "volatility", "confidence"];
+        if (numericInputs.some(id => byId(id).value.trim() === ""
+              || !Number.isFinite(numberValue(id)))
+            || base.spot <= 0 || base.strike <= 0
+            || base.time_to_expiry <= 0 || base.volatility <= 0
+            || confidence <= 0 || confidence >= 1 || pnls.length < 2
+            || pnls.some(value => !Number.isFinite(value))) {
+          throw new Error("Enter finite inputs: spot, strike, expiry and volatility "
+            + "must be positive; "
+            + "confidence must be between 0 and 1; provide at least two PnL observations.");
         }
-        const price = await priceResponse.json();
-        const greeks = await postJson("/greeks/european", base);
-        const implied = await postJson("/implied-volatility", {
+        const curveShocks = Array.from({length: 9}, (_, i) => ({
+          name: `curve_${i}`, spot_shift: (i - 4) * 0.05 * base.spot
+        }));
+        const [price, greeks, scenario, risk] = await Promise.all([
+          postJson("/price/european", base, signal),
+          postJson("/greeks/european", base, signal),
+          postJson("/risk/scenario-pnl", {...base, shocks: [
+            {name: "spot_down_5pct", spot_shift: -0.05 * base.spot},
+            {name: "vol_up_5_points", volatility_shift: 0.05}, ...curveShocks
+          ]}, signal),
+          postJson("/risk/historical-var", {pnls, confidence_level: confidence}, signal)
+        ]);
+        const implied = price.price <= 0 ? {implied_volatility: null}
+          : await postJson("/implied-volatility", {
           option_type: base.option_type,
           spot: base.spot,
           strike: base.strike,
@@ -408,18 +503,8 @@ DEMO_HTML = """<!doctype html>
           risk_free_rate: base.risk_free_rate,
           dividend_yield: base.dividend_yield,
           target_price: price.price
-        });
-        const scenario = await postJson("/risk/scenario-pnl", {
-          ...base,
-          shocks: [
-            {name: "spot_down_5pct", spot_shift: -0.05 * base.spot},
-            {name: "vol_up_5_points", volatility_shift: 0.05}
-          ]
-        });
-        const risk = await postJson("/risk/historical-var", {
-          pnls: parsePnls(),
-          confidence_level: numberValue("confidence")
-        });
+        }, signal);
+        if (current !== revision) return;
 
         byId("price").textContent = format(price.price);
         byId("delta").textContent = format(greeks.delta);
@@ -429,7 +514,7 @@ DEMO_HTML = """<!doctype html>
         byId("varEs").textContent = `${format(risk.value_at_risk)} / ${format(
           risk.expected_shortfall
         )}`;
-        byId("scenarioRows").innerHTML = scenario.results.map((result) => `
+        byId("scenarioRows").innerHTML = scenario.results.slice(0, 2).map((result) => `
           <tr>
             <td>${result.scenario_name}</td>
             <td>${format(result.base_price)}</td>
@@ -439,17 +524,42 @@ DEMO_HTML = """<!doctype html>
             <td>${format(result.shocked_volatility)}</td>
           </tr>
         `).join("");
+        drawCurve(scenario.results.slice(2));
         byId("status").textContent = "ready";
       } catch (error) {
+        if (current !== revision || signal.aborted) return;
         byId("status").textContent = "error";
         byId("log").textContent = error instanceof Error ? error.message : String(error);
       } finally {
-        byId("runButton").disabled = false;
+        if (current === revision) byId("runButton").disabled = false;
       }
     }
 
+    function scheduleUpdate() {
+      ++revision;
+      activeRequest?.abort();
+      clearTimeout(updateTimer);
+      clearResults();
+      byId("log").textContent = "";
+      byId("status").textContent = "updating";
+      byId("runButton").disabled = false;
+      updateTimer = setTimeout(runAnalytics, 250);
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
+      window.addEventListener("resize", () => drawCurve(curvePoints));
       byId("runButton").addEventListener("click", runAnalytics);
+      const controls = document.querySelectorAll(
+        ".controls input, .controls select, .controls textarea");
+      controls.forEach(input => {
+        input.addEventListener("input", () => {
+          if (input.id === "spotSlider") byId("spot").value = input.value;
+          if (input.id === "volSlider") byId("volatility").value = input.value;
+          if (input.id === "spot") byId("spotSlider").value = input.value;
+          if (input.id === "volatility") byId("volSlider").value = input.value;
+          scheduleUpdate();
+        });
+      });
       runAnalytics();
     });
   </script>

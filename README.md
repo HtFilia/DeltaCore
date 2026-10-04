@@ -274,6 +274,21 @@ Open the browser demo:
 http://127.0.0.1:8000/demo
 ```
 
+The demo offers keyboard-accessible spot and volatility sliders, automatic
+updates, and a nine-point option-price sensitivity curve from the existing
+scenario API. Expand **Inspect curve values** to see its numerical values.
+Rates and dividend yields are annual decimals, expiry is in years, and prices
+use the same currency units as spot/strike. The curve is another view of the
+same Black-Scholes model, not independent numerical validation or market data.
+Invalid inputs clear old results rather than leaving stale prices visible.
+
+For optional desktop/mobile browser checks against a running API (Playwright
+must be available):
+
+```bash
+DELTACORE_DEMO_URL=http://127.0.0.1:8000 node tests/browser/demo.cjs
+```
+
 Current endpoints:
 
 ```text
