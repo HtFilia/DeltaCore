@@ -79,6 +79,7 @@ DEMO_HTML = """<!doctype html>
     }
 
     .panel {
+      min-width: 0;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -149,6 +150,7 @@ DEMO_HTML = """<!doctype html>
 
     .results {
       display: grid;
+      min-width: 0;
       gap: 16px;
     }
 
@@ -196,6 +198,11 @@ DEMO_HTML = """<!doctype html>
       padding: 0 16px 16px;
     }
 
+    .table-wrap:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -233,7 +240,7 @@ DEMO_HTML = """<!doctype html>
     @media (max-width: 860px) {
       main,
       .metrics {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       header {
@@ -312,7 +319,7 @@ DEMO_HTML = """<!doctype html>
         </section>
 
         <section class="panel">
-          <div class="table-wrap">
+          <div class="table-wrap" role="region" aria-label="Scenario results" tabindex="0">
             <table>
               <thead>
                 <tr>

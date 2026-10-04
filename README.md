@@ -376,3 +376,14 @@ at `/demo` and calls the same FastAPI endpoints exposed to external clients.
 Exotic products, calibration surfaces, Monte Carlo API exposure, and broader
 market-risk workflows are planned milestones and will be documented with
 explicit assumptions as they are implemented.
+
+## Native homelab deployment
+
+The prepared homelab manifest runs this API behind Caddy with
+`sudo homelab project deploy deltacore`. It checks formatting, lint, typing and
+tests before activating an immutable release. Uvicorn is a runtime dependency,
+so a production-only `uv sync --frozen --no-extra dev --no-editable` retains the
+server. The backend binds loopback; `/health` is the readiness endpoint and
+the public root redirects to the existing `/demo`. The service is stateless.
+Public DNS and privileged host setup require separate publication; this README
+does not claim that the prepared VPS demo is already live.
