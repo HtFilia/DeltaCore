@@ -141,4 +141,4 @@ def test_demo_page_is_served_as_html() -> None:
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "DeltaCore Demo" in response.text
-    assert 'fetch("/price/european"' in response.text
+    assert 'postJson("/price/european"' in response.text
