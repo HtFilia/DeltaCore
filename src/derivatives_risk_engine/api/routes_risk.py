@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from derivatives_risk_engine.api.schemas import (
+    AttributionRequest,
     CalibrationDiagnosticsResponse,
     EuropeanGreeksRequest,
     EuropeanGreeksResponse,
@@ -15,12 +16,14 @@ from derivatives_risk_engine.api.schemas import (
 from derivatives_risk_engine.core.exceptions import DomainInputError
 from derivatives_risk_engine.core.instruments import EuropeanOption, OptionType
 from derivatives_risk_engine.core.market import BlackScholesMarket
+from derivatives_risk_engine.risk.attribution import AttributionResult, AttributionShock
 from derivatives_risk_engine.risk.scenario import MarketShock
 from derivatives_risk_engine.services.pricing_service import BLACK_SCHOLES_MODEL, PRICING_CONVENTION
 from derivatives_risk_engine.services.risk_service import (
     compute_black_scholes_scenario_pnl,
     compute_european_greeks,
     compute_historical_var_expected_shortfall,
+    compute_scenario_attribution,
     solve_european_implied_volatility,
 )
 
@@ -191,3 +194,19 @@ def historical_var(request: HistoricalVarRequest) -> HistoricalVarResponse:
         tail_observations=result.tail_observations,
         quantile_index=result.quantile_index,
     )
+
+
+@router.post("/risk/scenario-attribution", response_model=list[AttributionResult])
+def scenario_attribution(request: AttributionRequest) -> tuple[AttributionResult, ...]:
+    try:
+        return compute_scenario_attribution(
+            option=_option_from_request(
+                request.option_type, request.strike, request.time_to_expiry
+            ),
+            market=_market_from_request(
+                request.spot, request.risk_free_rate, request.dividend_yield, request.volatility
+            ),
+            shocks=tuple(AttributionShock(**shock.model_dump()) for shock in request.shocks),
+        )
+    except DomainInputError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

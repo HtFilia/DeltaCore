@@ -109,3 +109,29 @@ def test_expired_black_scholes_greeks_are_rejected() -> None:
 
     with pytest.raises(ValueError, match="Greeks are undefined at expiry"):
         black_scholes_greeks(option, market)
+
+
+@pytest.mark.parametrize("kind", ["call", "put"])
+@pytest.mark.parametrize("expiry", [1 / 365, 0.05])
+def test_near_expiry_greeks_with_dividend_against_finite_differences(
+    kind: str, expiry: float
+) -> None:
+    # Small central bumps remain away from T=0; tolerances allow cancellation
+    # in second derivatives while detecting unit/sign errors at the tested scale.
+    option = EuropeanOption(option_type=kind, strike=100, time_to_expiry=expiry)  # type: ignore[arg-type]
+    market = BlackScholesMarket(spot=100, risk_free_rate=0.05, dividend_yield=0.01, volatility=0.2)
+    greeks = black_scholes_greeks(option, market)
+    delta = central_difference(
+        lambda spot: black_scholes_price(option, replace(market, spot=spot)), point=100, bump=1e-4
+    )
+    gamma = second_order_central_difference(
+        lambda spot: black_scholes_price(option, replace(market, spot=spot)), point=100, bump=1e-3
+    )
+    theta = -central_difference(
+        lambda t: black_scholes_price(replace(option, time_to_expiry=t), market),
+        point=expiry,
+        bump=1e-7,
+    )
+    assert greeks.delta == pytest.approx(delta, rel=1e-7)
+    assert greeks.gamma == pytest.approx(gamma, rel=1e-5)
+    assert greeks.theta == pytest.approx(theta, rel=1e-7)

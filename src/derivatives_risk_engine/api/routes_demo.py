@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
@@ -17,3 +18,11 @@ def asset(name: str) -> FileResponse:
     if name not in {"demo.css", "demo.js"}:
         raise HTTPException(status_code=404, detail="Asset not found")
     return FileResponse(_STATIC / name)
+
+
+@router.get("/demo-meta", include_in_schema=False)
+def metadata() -> dict[str, str]:
+    return {
+        "revision": os.environ.get("DEMO_BUILD_REVISION", "unknown"),
+        "case_version": "option-risk-v1",
+    }

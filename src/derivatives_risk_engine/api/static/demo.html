@@ -1,120 +1,60 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DeltaCore Demo</title>
-  <link rel="stylesheet" href="/demo-assets/demo.css">
-</head>
-<body>
-  <div class="shell">
-    <header>
-      <h1>DeltaCore</h1><nav><a href="https://lucaslebihan.dev/en/">Portfolio</a> · <a href="https://github.com/HtFilia/DeltaCore/blob/main/tests/unit/test_black_scholes_greeks.py">Numerical tests</a></nav>
-      <div class="status" id="status" role="status" aria-live="polite">idle</div>
-    </header>
-
-    <main>
-      <section class="panel controls" aria-label="Inputs">
-        <p class="intro">Explore a European option under Black-Scholes. Change spot or volatility
-          to update prices and scenarios. Synthetic inputs; no live market data.</p>
-        <div class="grid">
-          <label>Type
-            <select id="optionType">
-              <option value="call">Call</option>
-              <option value="put">Put</option>
-            </select>
-          </label>
-          <label>Spot (currency units)
-            <input id="spot" type="number" min="0.01" step="0.01" value="100">
-          </label>
-          <label class="wide">Explore spot (10 to 200)
-            <input id="spotSlider" type="range" min="10" max="200" step="1" value="100">
-          </label>
-          <label>Strike
-            <input id="strike" type="number" step="0.01" value="100">
-          </label>
-          <label>Expiry (years)
-            <input id="expiry" type="number" min="0.0001" step="0.01" value="1">
-          </label>
-          <label>Rate (annual decimal)
-            <input id="rate" type="number" step="0.001" value="0.05">
-          </label>
-          <label>Dividend (annual decimal)
-            <input id="dividend" type="number" step="0.001" value="0">
-          </label>
-          <label>Volatility (annual decimal)
-            <input id="volatility" type="number" step="0.01" value="0.20">
-          </label>
-          <label class="wide">Explore volatility (1% to 100%)
-            <input id="volSlider" type="range" min="0.01" max="1" step="0.01" value="0.20">
-          </label>
-          <label>Confidence
-            <input id="confidence" type="number" step="0.01" value="0.80">
-          </label>
-          <label class="wide">PnL observations
-            <textarea id="pnls">12, 7, 5, 2, 0, -1, -3, -8, -10, -20</textarea>
-          </label>
-        </div>
-        <button id="runButton" type="button">Run analytics</button>
-      </section>
-
-      <section class="results" aria-label="Results">
-        <section class="panel metrics">
-          <div class="metric">
-            <span>Price</span>
-            <strong id="price">-</strong>
-          </div>
-          <div class="metric">
-            <span>Delta</span>
-            <strong id="delta">-</strong>
-          </div>
-          <div class="metric">
-            <span>Recovered input volatility</span>
-            <strong id="impliedVol">-</strong>
-          </div>
-          <div class="metric negative">
-            <span>VaR / ES</span>
-            <strong id="varEs">-</strong>
-          </div>
-        </section>
-
-        <section class="panel curve" aria-label="Price sensitivity">
-          <h2>Option price versus spot</h2>
-          <p class="intro">Nine scenarios from 80% to 120% of the selected spot.
-            Other inputs stay fixed.
-            The dot marks the selected spot. Prices use the same backend model as the metrics.</p>
-          <svg id="priceCurve" viewBox="0 0 640 250" role="img"
-            aria-label="Option price versus spot; numerical values in the table below"></svg>
-          <details><summary>Inspect curve values</summary>
-            <div class="table-wrap" role="region" aria-label="Curve values" tabindex="0">
-              <table><thead><tr><th>Spot</th><th>Option price</th></tr></thead>
-                <tbody id="curveRows"></tbody></table>
-            </div>
-          </details>
-        </section>
-
-        <section class="panel">
-          <div class="table-wrap" role="region" aria-label="Scenario results" tabindex="0">
-            <table>
-              <thead>
-                <tr>
-                  <th>Scenario</th>
-                  <th>Base</th>
-                  <th>Shocked</th>
-                  <th>PnL</th>
-                  <th>Spot</th>
-                  <th>Vol</th>
-                </tr>
-              </thead>
-              <tbody id="scenarioRows"></tbody>
-            </table>
-          </div>
-          <p class="log" id="log" role="status"></p><p id="ivLog"></p><p id="rangeNote"></p><p id="riskLog" role="status"></p>
-        </section>
-      </section>
-    </main>
-  </div>
-
-  <script src="/demo-assets/demo.js" defer></script>
-</body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeltaCore Demo — explain option risk</title><link rel="stylesheet" href="/demo-assets/demo.css"></head>
+<body><div class="shell">
+<header><div><div class="eyebrow">Synthetic European option · one option unit</div><h1>DeltaCore</h1></div>
+<nav aria-label="Project navigation"><a href="#evidence">Evidence</a> · <a href="https://github.com/HtFilia/DeltaCore">Source</a> · <a href="https://lucaslebihan.dev/en/">Portfolio</a> · <a href="/docs">API</a></nav></header>
+<h2 class="question">What explains this option's change in value?</h2>
+<p class="intro">Apply a market shock, compare full repricing with a local Greek approximation, and inspect what the approximation misses. Black–Scholes, synthetic inputs; no live market data.</p>
+<div id="status" role="status" aria-live="polite">Preparing the case…</div>
+<section class="metrics" aria-label="Price comparison">
+<div class="panel metric"><span>Base price · currency units</span><strong id="price">—</strong></div>
+<div class="panel metric"><span>Shocked price</span><strong id="shockedPrice">—</strong></div>
+<div class="panel metric"><span>Full repricing P&amp;L</span><strong id="fullPnl">—</strong></div>
+<div class="panel metric"><span>Residual · full minus approximation</span><strong id="residual">—</strong></div>
+</section>
+<main class="workspace">
+<section class="panel controls" aria-label="Shock controls">
+<h2>1. Apply a shock</h2><p>Base state stays fixed while you explore.</p>
+<div class="presets" role="group" aria-label="Named shocks">
+<button type="button" data-preset="spot">−5% spot</button><button type="button" data-preset="vol">+5 vol points</button>
+<button type="button" data-preset="combined">Spot + volatility</button><button type="button" data-preset="time">7 calendar days</button><button type="button" data-preset="none">No shock</button></div>
+<div class="grid">
+<label>Spot change (%)<input id="spotShock" type="number" min="-99" max="100" step="1" value="-5"></label>
+<label>Volatility change (vol points)<input id="volShock" type="number" min="-99" max="100" step="1" value="0"></label>
+<label>Elapsed calendar days (365-day year)<input id="elapsedDays" type="number" min="0" max="36500" step="1" value="0"></label>
+</div><button id="reset" type="button">Reset baseline</button><p id="shockError" class="error" role="status"></p>
+<details id="assumptions"><summary>Change base option assumptions</summary>
+<div class="grid">
+<label>Type<select id="optionType"><option value="call">Call</option><option value="put">Put</option></select></label>
+<label>Spot (currency units)<input id="spot" type="number" min="0.01" step="0.01" value="100"></label>
+<label class="wide">Explore spot (10 to 200)<input id="spotSlider" type="range" min="10" max="200" value="100"></label>
+<label>Strike (same currency)<input id="strike" type="number" min="0.01" step="0.01" value="100"></label>
+<label>Remaining expiry (years)<input id="expiry" type="number" min="0" step="0.01" value="1"></label>
+<label>Rate (continuous annual decimal)<input id="rate" type="number" step="0.001" value="0.05"></label>
+<label>Dividend (continuous annual decimal)<input id="dividend" type="number" step="0.001" value="0"></label>
+<label>Volatility (annual decimal)<input id="volatility" type="number" min="0.001" step="0.01" value="0.20"></label>
+<label class="wide">Explore volatility (1% to 100%)<input id="volSlider" type="range" min="0.01" max="1" step="0.01" value="0.20"></label>
+</div><p id="rangeNote"></p><button id="runButton" type="button">Run analytics</button></details>
+</section>
+<section class="panel curve" aria-label="Price sensitivity"><h2>2. Compare the prices</h2>
+<p class="intro">The curve reprices the base option versus spot. Dots show the actual base and shocked states; a volatility/time shock can move off the curve.</p>
+<svg id="priceCurve" viewBox="0 0 640 260" role="img" aria-label="Base option price versus spot, with labeled base and shocked states. Exact values below."></svg>
+<p id="curveNote"></p><details><summary>Inspect curve values</summary><div class="table-wrap" tabindex="0" role="region" aria-label="Curve values"><table><thead><tr><th>Spot</th><th>Base option price</th></tr></thead><tbody id="curveRows"></tbody></table></div></details></section>
+</main>
+<section class="panel explanation" aria-label="Risk attribution"><h2>3. Explain the move</h2>
+<p id="explanation">Preparing contributions…</p><div id="contributionChart" class="contributions" role="img" aria-label="Greek contributions and residual; exact values in table below"></div>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Attribution values"><table><thead><tr><th>Component</th><th>Currency units</th><th>Convention</th></tr></thead><tbody id="attributionRows"></tbody></table></div>
+<p>Local expansion at the base state. Cross and higher-order terms are omitted; the residual is approximation error, not a separate trading gain. Large shocks and near-expiry cases can be less accurate.</p>
+<details><summary>Inspect all base Greeks</summary><div id="greeks"></div></details></section>
+<section class="panel supporting"><details><summary>IV consistency check and diagnostics</summary><p>Invert the price generated above using the same Black–Scholes model. This checks internal consistency; it is not market calibration or independent validation.</p><strong id="impliedVol">—</strong><p id="ivLog" role="status"></p></details>
+<details><summary>Independent historical loss sample</summary><p>This supplied P&amp;L sample is unrelated to the option. Gains are positive; losses are negative.</p><div class="grid"><label>Confidence<input id="confidence" type="number" min="0.01" max="0.99" step="0.01" value="0.80"></label><label>P&amp;L observations<textarea id="pnls">12, 7, 5, 2, 0, -1, -3, -8, -10, -20</textarea></label></div><strong id="varEs">—</strong><p id="riskLog" role="status"></p><p>VaR uses ceil(confidence × n) − 1 in sorted losses. ES averages losses at and beyond that observation. A small synthetic sample is illustrative.</p></details></section>
+<section id="evidence" class="panel evidence"><h2>4. Inspect the evidence</h2><p>Deterministic case v1 · one option unit · annual continuous rates and volatility · calendar-time decay per year.</p>
+<button id="download" type="button" disabled>Download input and results JSON</button>
+<ul><li>Independent closed-form fixtures and invariants: <a href="https://github.com/HtFilia/DeltaCore/blob/main/tests/unit/test_black_scholes.py">pricing tests</a>.</li>
+<li>Numerical derivative comparison: <a href="https://github.com/HtFilia/DeltaCore/blob/main/tests/unit/test_black_scholes_greeks.py">Greek tests and bump conventions</a>.</li>
+<li>Same-model agreement: curve, shocked prices and IV round trip share this backend. They do not supply independent validation.</li></ul>
+<p>Build revision: <code id="revision">unknown</code>. No production accuracy or latency claim.</p></section>
+<p id="log" class="error" role="status"></p>
+</div><script src="/demo-assets/demo.js" defer></script></body></html>

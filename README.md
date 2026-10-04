@@ -402,3 +402,23 @@ server. The backend binds loopback; `/health` is the readiness endpoint and
 the public root redirects to the existing `/demo`. The service is stateless.
 Public DNS and privileged host setup require separate publication; this README
 does not claim that the prepared VPS demo is already live.
+
+## Guided risk investigation
+
+`/demo` preserves a base European option and applies bounded spot, volatility
+and calendar-time shocks. `/risk/scenario-attribution` returns full repricing,
+base-state delta/gamma/vega/theta contributions and their signed residual for one
+option unit. Five volatility points mean an absolute 0.05 change; elapsed days
+use a 365-day year and reduce remaining expiry. The approximation omits cross
+and higher-order terms; it can deteriorate for large shocks and near expiry.
+
+The evidence drawer separates reference fixtures, numerical derivative checks
+and same-model curve/IV consistency. Downloaded JSON retains exact inputs and
+outputs. The historical P&L sample is independent of the option and has its own
+errors. A zero-expiry option can be priced, but base Greeks/attribution are
+undefined. IV inversion reports solver bounds and failure reasons.
+
+Set `DEMO_BUILD_REVISION` to the actual build SHA to identify a packaged release;
+otherwise the page honestly displays `unknown`. Static assets ship in the wheel.
+Browser journey checks: `node tests/browser/demo.cjs` with Playwright available
+and `DELTACORE_DEMO_URL` pointing at a local server.
