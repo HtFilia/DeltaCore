@@ -270,3 +270,4 @@ summary {cursor:pointer;font-weight:600;padding:14px 0}details {margin-top:8px}
 @media(max-width:860px){.workspace {grid-template-columns:1fr}.metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.question {font-size:24px}.metric strong{font-size:23px}.shell {padding:16px}.contribution {grid-template-columns:95px minmax(0,1fr) 80px}.curve text{font-size:11px}}
 @media(max-width:860px){.metric strong{font-size:18px}}
 @media(max-width:360px){.metrics{grid-template-columns:1fr}}
+@media(max-width:860px){.metrics{padding:0}}
