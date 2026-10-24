@@ -9,8 +9,11 @@
 ![Typing](https://img.shields.io/badge/typing-mypy%20strict-2A6DB0)
 ![Quality](https://img.shields.io/badge/quality-ruff%20%7C%20pytest-5A5A5A)
 
-Production-minded Python backend for derivatives pricing, Greeks, volatility
-calibration, and market-risk analytics.
+Python backend for European option pricing, Greeks, implied volatility, and
+market-risk analytics.
+
+**[Open the live demo →](https://deltacore.lucaslebihan.dev/demo)** (synthetic inputs, no live
+market data)
 
 DeltaCore provides deterministic pricing and risk components for vanilla
 derivatives workflows. Pure pricing kernels sit behind typed API boundaries,
@@ -41,9 +44,9 @@ pure Python kernels and typed HTTP boundaries.
 | --- | --- |
 | Pricing | European call/put options under Black-Scholes and Bachelier |
 | API | FastAPI endpoints for pricing, Greeks, implied volatility, scenario PnL, and VaR/ES |
-| Demo | Browser demo at `/demo`, backed by live API calls |
+| Demo | Browser demo at `/demo`, backed by live API calls; [live at deltacore.lucaslebihan.dev](https://deltacore.lucaslebihan.dev/demo) |
 | Greeks | Analytic Black-Scholes delta, gamma, vega, theta, rho |
-| Calibration | Black-Scholes implied volatility with convergence diagnostics |
+| Implied volatility | Black-Scholes implied volatility with convergence diagnostics |
 | Monte Carlo | Black-Scholes European pricing with standard error and confidence interval |
 | Risk | Deterministic scenario PnL, historical VaR, and Expected Shortfall |
 | Validation | Closed-form fixtures, put-call parity, finite-difference Greeks |
@@ -57,7 +60,7 @@ The distribution name is `deltacore`; the Python import namespace remains
 
 Pricing services need model behavior that remains inspectable when numerical
 logic is exposed through an API. DeltaCore separates pure quantitative kernels
-from transport and orchestration so pricing, calibration, and risk calculations
+from transport and orchestration so pricing, implied-volatility, and risk calculations
 can be validated independently and reused consistently.
 
 The implementation emphasizes:
@@ -79,7 +82,7 @@ The implementation emphasizes:
   decay per year, equivalent to `-dV/dT`.
 - Black-Scholes implied volatility uses bounded one-dimensional root finding.
   Results report convergence, objective residual, iteration count, volatility
-  bounds, and a structured failure reason when calibration is not possible.
+  bounds, and a structured failure reason when inversion is not possible.
 - Monte Carlo pricing uses the risk-neutral Black-Scholes terminal distribution,
   explicit random seeds, discounted payoff means, standard error, and a
   normal-approximation confidence interval.

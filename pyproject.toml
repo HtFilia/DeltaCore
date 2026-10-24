@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "deltacore"
 version = "0.1.0"
-description = "Production-minded Python backend for derivatives pricing, Greeks, volatility calibration, and market-risk analytics."
+description = "Python backend for European option pricing, Greeks, implied volatility, and market-risk analytics."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

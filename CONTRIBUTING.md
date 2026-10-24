@@ -2,8 +2,8 @@
 
 ## Scope and architecture
 
-DeltaCore is a Python backend for derivatives pricing, Greeks, volatility
-calibration, and market-risk analytics. Keep dependency flow directed from the
+DeltaCore is a Python backend for European option pricing, Greeks, implied
+volatility, and market-risk analytics. Keep dependency flow directed from the
 API through services into pure domain, model, numerical, calibration, and risk
 modules. Domain code must not depend on FastAPI.
 
