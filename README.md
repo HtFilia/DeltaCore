@@ -374,7 +374,7 @@ deterministic so they can be tested independently from transport concerns.
 - [x] Implement Black-Scholes European call/put pricing.
 - [x] Validate with closed-form fixtures and put-call parity.
 - [x] Add Bachelier pricing for normal-volatility workflows.
-- [x] Add analytic and finite-difference Greeks.
+- [x] Add analytic Black-Scholes Greeks, checked against finite differences in tests.
 - [x] Add implied-volatility solving with convergence diagnostics.
 - [x] Add Monte Carlo pricing with confidence intervals.
 - [x] Add scenario PnL and deterministic stress tests.
@@ -398,13 +398,13 @@ explicit assumptions as they are implemented.
 ## Native homelab deployment
 
 The prepared homelab manifest runs this API behind Caddy with
-`sudo homelab project deploy deltacore`. It checks formatting, lint, typing and
+`sudo homelab project deploy deltacore` (`homelab` is the author's private server
+tooling, not part of this repository). It checks formatting, lint, typing and
 tests before activating an immutable release. Uvicorn is a runtime dependency,
 so a production-only `uv sync --frozen --no-extra dev --no-editable` retains the
 server. The backend binds loopback; `/health` is the readiness endpoint and
 the public root redirects to the existing `/demo`. The service is stateless.
-Public DNS and privileged host setup require separate publication; this README
-does not claim that the prepared VPS demo is already live.
+The demo is published at <https://deltacore.lucaslebihan.dev/demo>.
 
 ## Guided risk investigation
 

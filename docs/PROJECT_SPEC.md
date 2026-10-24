@@ -2,7 +2,7 @@
 
 ## Objective
 
-Create DeltaCore: a Python backend that prices vanilla derivatives, computes Greeks, calibrates simple volatility models, and exposes risk analytics through a typed API.
+Create DeltaCore: a Python backend that prices vanilla European options, computes Greeks, inverts prices for implied volatility, and exposes risk analytics through a typed API. Each item below states whether it is implemented or planned.
 
 ## Target users
 
@@ -14,40 +14,41 @@ Create DeltaCore: a Python backend that prices vanilla derivatives, computes Gre
 
 ### Pricing
 
-- European call/put under Black-Scholes.
-- European call/put under Bachelier/normal model.
-- Digital options as an optional later milestone.
-- Monte Carlo pricing for vanilla options.
+- European call/put under Black-Scholes (implemented; served by the API).
+- European call/put under Bachelier/normal model (implemented in the library; not served by the API).
+- Digital options (planned, optional).
+- Monte Carlo pricing for vanilla options (implemented in the library with standard error and confidence interval; API exposure planned).
 
 ### Greeks
 
-- Delta, gamma, vega, theta, rho.
-- Closed-form Greeks where appropriate.
-- Finite-difference Greeks as a generic fallback.
-- Comparison tests between analytic and numerical Greeks.
+- Delta, gamma, vega, theta, rho under Black-Scholes (implemented, closed form).
+- Finite-difference derivatives (implemented as numerical helpers, used by tests rather than as a runtime fallback).
+- Comparison tests between analytic and numerical Greeks (implemented).
 
 ### Calibration
 
-- Implied volatility via robust root finding.
-- Smile calibration to simple parametric forms as a later milestone.
-- Calibration diagnostics and failure modes.
+- Black-Scholes implied volatility via bounded root finding (implemented).
+- Smile calibration to simple parametric forms (planned).
+- Solver diagnostics and structured failure reasons (implemented).
 
 ### Risk
 
-- Scenario PnL.
-- Historical or simulated VaR.
-- Expected Shortfall.
-- Stress testing by spot, volatility, rate, and time shocks.
+- Scenario PnL with spot, volatility, rate, dividend and time shocks (implemented).
+- Greek attribution of a scenario with its residual (implemented).
+- Historical VaR and Expected Shortfall (implemented); simulated VaR (planned).
 
 ### API
 
-- `/health`
-- `/price/european`
-- `/greeks/european`
-- `/implied-volatility`
-- `/risk/scenario-pnl`
-- `/risk/historical-var`
-- `/demo` for a lightweight browser demonstration backed by API calls
+Implemented:
+
+- `GET /health`
+- `POST /price/european`
+- `POST /greeks/european`
+- `POST /implied-volatility`
+- `POST /risk/scenario-pnl`
+- `POST /risk/scenario-attribution`
+- `POST /risk/historical-var`
+- `GET /demo` and `GET /demo-meta` for the browser demonstration backed by API calls
 
 ## Out of scope for the first version
 
