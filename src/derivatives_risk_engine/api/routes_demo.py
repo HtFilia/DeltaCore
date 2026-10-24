@@ -15,7 +15,7 @@ def demo() -> HTMLResponse:
 
 @router.get("/demo-assets/{name}", include_in_schema=False)
 def asset(name: str) -> FileResponse:
-    if name not in {"demo.css", "demo.js"}:
+    if name not in {"demo.css", "demo.js", "preview.png"}:
         raise HTTPException(status_code=404, detail="Asset not found")
     return FileResponse(_STATIC / name)
 

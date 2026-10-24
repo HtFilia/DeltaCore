@@ -145,6 +145,12 @@ def test_demo_page_is_served_as_html() -> None:
     assert script.status_code == 200
     assert "/price/european" in script.text
     assert client.get("/demo-assets/missing.js").status_code == 404
+    # The link preview that LinkedIn and other sites show is served next to the page.
+    preview_url = "https://deltacore.lucaslebihan.dev/demo-assets/preview.png"
+    assert f'property="og:image" content="{preview_url}"' in response.text
+    preview = client.get("/demo-assets/preview.png")
+    assert preview.status_code == 200
+    assert preview.headers["content-type"] == "image/png"
 
 
 def test_attribution_endpoint_is_bounded_and_retains_signed_time_convention() -> None:
