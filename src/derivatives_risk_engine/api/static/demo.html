@@ -9,10 +9,12 @@
 <meta property="og:image" content="https://deltacore.lucaslebihan.dev/demo-assets/preview.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="DeltaCore live demo: title, what it does, and a screenshot of the demo.">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/demo-assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/demo-assets/demo.css"></head>
-<body><div class="shell">
+<body><div class="author-bar"><a class="author" href="https://lucaslebihan.dev/en/?ref=deltacore">Lucas Lebihan <span>· Quantitative Engineer / Quant Developer</span></a><nav aria-label="Author"><a href="https://lucaslebihan.dev/en/?ref=deltacore">Portfolio</a><a href="https://lucaslebihan.dev/cv-en.pdf">Résumé</a><a href="mailto:contact@lucaslebihan.dev?subject=DeltaCore%20demo">Contact</a></nav></div>
+<div class="shell">
 <header><div><div class="eyebrow">Synthetic European option · one option unit</div><h1>DeltaCore</h1></div>
-<nav aria-label="Project navigation"><a href="#evidence">Evidence</a> · <a href="https://github.com/HtFilia/DeltaCore">Source</a> · <a href="https://lucaslebihan.dev/en/">Portfolio</a> · <a href="/docs">API</a></nav></header>
+<nav aria-label="Project navigation"><a href="#evidence">Evidence</a> · <a href="https://github.com/HtFilia/DeltaCore">Source</a> · <a href="/docs">API</a></nav></header>
 <h2 class="question">What explains this option's change in value?</h2>
 <p class="intro">Apply a market shock, compare full repricing with a local Greek approximation, and inspect what the approximation misses. Black–Scholes, synthetic inputs; no live market data.</p>
 <div id="status" role="status" aria-live="polite">Preparing the case…</div>
@@ -63,6 +65,6 @@
 <ul><li>Independent closed-form fixtures and invariants: <a href="https://github.com/HtFilia/DeltaCore/blob/main/tests/unit/test_black_scholes.py">pricing tests</a>.</li>
 <li>Numerical derivative comparison: <a href="https://github.com/HtFilia/DeltaCore/blob/main/tests/unit/test_black_scholes_greeks.py">Greek tests and bump conventions</a>.</li>
 <li>Same-model agreement: curve, shocked prices and IV round trip share this backend. They do not supply independent validation.</li></ul>
-<p>Build revision: <code id="revision">unknown</code>. No production accuracy or latency claim.</p></section>
+<p><span id="revision-line" hidden>Build revision: <code id="revision">unknown</code>. </span>No production accuracy or latency claim.</p></section>
 <p id="log" class="error" role="status"></p>
 </div><script src="/demo-assets/demo.js" defer></script></body></html>

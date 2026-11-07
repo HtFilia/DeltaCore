@@ -153,6 +153,21 @@ def test_demo_page_is_served_as_html() -> None:
     assert preview.headers["content-type"] == "image/png"
 
 
+def test_demo_names_its_author_and_carries_the_portfolio_favicon() -> None:
+    page = client.get("/demo").text
+
+    assert 'href="https://lucaslebihan.dev/en/?ref=deltacore"' in page
+    assert 'href="https://lucaslebihan.dev/cv-en.pdf"' in page
+    assert 'href="mailto:contact@lucaslebihan.dev?subject=DeltaCore%20demo"' in page
+    assert 'rel="icon" href="/demo-assets/favicon.svg"' in page
+    favicon = client.get("/demo-assets/favicon.svg")
+    assert favicon.status_code == 200
+    assert favicon.headers["content-type"].startswith("image/svg+xml")
+    docs = client.get("/docs").text
+    assert "/demo-assets/favicon.svg" in docs
+    assert "fastapi.tiangolo.com/img/favicon" not in docs
+
+
 def test_attribution_endpoint_is_bounded_and_retains_signed_time_convention() -> None:
     base = {
         "option_type": "call",

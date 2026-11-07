@@ -1,5 +1,6 @@
 const byId = id => document.getElementById(id);
-const fmt = value => Number(value).toLocaleString(undefined, {maximumFractionDigits:6});
+// Round to the displayed precision first, so a tiny negative value never prints as "-0".
+const fmt = value => {const rounded=Math.round(Number(value)*1e6)/1e6;return (rounded===0?0:rounded).toLocaleString(undefined, {maximumFractionDigits:6});};
 const defaults = {optionType:'call',spot:'100',strike:'100',expiry:'1',rate:'0.05',dividend:'0',volatility:'0.20',spotShock:'-5',volShock:'0',elapsedDays:'0'};
 const presets = {spot:[-5,0,0],vol:[0,5,0],combined:[-5,5,0],time:[0,0,7],none:[0,0,0]};
 let revision=0, active, timer, exported=null, riskRevision=0;
@@ -38,7 +39,7 @@ function drawCurve(points,b,result){
   add('text',{x:50,y:240},fmt(min));add('text',{x:width-25,y:240,'text-anchor':'end'},fmt(max));add('text',{x:width/2,y:265,'text-anchor':'middle'},'Spot (currency units)');
   const basePrice=result?.base_price??Number(byId('price').textContent.replaceAll(',',''));
   add('circle',{cx:x(b.spot),cy:y(basePrice),r:5});add('text',{x:x(b.spot)+6,y:y(basePrice)-10},'Base');
-  if(result){add('circle',{cx:x(result.shocked_spot),cy:y(result.shocked_price),r:5,style:'fill:#b23745'});add('text',{x:Math.min(width-50,x(result.shocked_spot)+6),y:y(result.shocked_price)+18},'Shocked');}
+  if(result){add('circle',{cx:x(result.shocked_spot),cy:y(result.shocked_price),r:5,style:'fill:#a04a3b'});add('text',{x:Math.min(width-50,x(result.shocked_spot)+6),y:y(result.shocked_price)+18},'Shocked');}
   byId('curveRows').replaceChildren();points.forEach(p=>{const tr=document.createElement('tr');[p.shocked_spot,p.shocked_price].forEach(v=>{const td=document.createElement('td');td.textContent=fmt(v);tr.append(td);});byId('curveRows').append(tr);});
 }
 function renderAttribution(r){
@@ -79,6 +80,7 @@ document.querySelectorAll('[data-preset]').forEach(btn=>btn.addEventListener('cl
 byId('reset').addEventListener('click',()=>{Object.entries(defaults).forEach(([id,v])=>byId(id).value=v);byId('spotSlider').value=100;byId('volSlider').value=.2;schedule();});byId('runButton').addEventListener('click',runAnalytics);
 ['pnls','confidence'].forEach(id=>byId(id).addEventListener('input',runRisk));
 byId('download').addEventListener('click',()=>{if(!exported)return;const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='deltacore-option-risk.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-fetch('/demo-meta').then(r=>r.json()).then(m=>text('revision',m.revision)).catch(()=>{});runAnalytics();runRisk();
+// The revision line shows only when the deployment states it.
+fetch('/demo-meta').then(r=>r.json()).then(m=>{if(m.revision&&m.revision!=='unknown'){text('revision',m.revision);byId('revision-line').hidden=false;}}).catch(()=>{});runAnalytics();runRisk();
 
 window.addEventListener('resize',()=>{if(exported)drawCurve(exported.curve,exported.base,exported.attribution);});
