@@ -1,16 +1,18 @@
 
     :root {
       color-scheme: light;
-      --bg: #f5f7f8;
-      --panel: #ffffff;
-      --ink: #172126;
-      --muted: #5f6c74;
-      --line: #d9e0e3;
-      --accent: #006d77;
-      --accent-dark: #004e56;
-      --danger: #a23b3b;
-      --positive: #0f7b55;
-      --shadow: 0 10px 30px rgba(23, 33, 38, 0.08);
+      /* Paper, ink and sage of lucaslebihan.dev (webfolio brand/identity.json, light theme), so
+         the demo reads as the portfolio author's work. */
+      --bg: #f3eee4;
+      --panel: #faf7f0;
+      --ink: #2a2620;
+      --muted: #5e5549;
+      --line: #d5cbba;
+      --accent: #496b50;
+      --accent-dark: #385a41;
+      --danger: #a04a3b;
+      --positive: #385a41;
+      --shadow: 0 1px 0 rgba(42, 38, 32, 0.06);
     }
 
     * {
@@ -44,6 +46,8 @@
 
     h1 {
       margin: 0;
+      font-family: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+      font-weight: 600;
       font-size: 28px;
       line-height: 1.1;
       letter-spacing: 0;
@@ -101,7 +105,7 @@
       border-radius: 6px;
       padding: 9px 10px;
       color: var(--ink);
-      background: #ffffff;
+      background: #fffdf8;
       font: inherit;
       font-size: 14px;
     }
@@ -125,7 +129,7 @@
       margin-top: 14px;
       padding: 11px 12px;
       background: var(--accent);
-      color: #ffffff;
+      color: #faf7f0;
       font-weight: 700;
       cursor: pointer;
     }
@@ -157,7 +161,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px;
-      background: #fbfcfc;
+      background: var(--bg);
     }
 
     .metric span {
@@ -254,20 +258,29 @@
         width: 100%;
       }
     }
-  /* Keep the original teal, light panels and system font. */
-header {gap:16px;flex-wrap:wrap} nav {line-height:1.8} a {color:#006872}
-.eyebrow {font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#526471}
+  /* Portfolio palette (2026-11-07), system font. */
+header {gap:16px;flex-wrap:wrap} nav {line-height:1.8} a {color:var(--accent-dark)}
+.eyebrow {font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .question {font-size:28px;margin:24px 0 8px}.workspace {display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.4fr);gap:18px;margin:18px 0}
 .metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
 .metric strong {overflow-wrap:anywhere;font-size:26px}.controls {padding:20px}.controls h2 {margin-top:0}
 .presets {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px} button {cursor:pointer}
 .presets button {width:auto;margin:0;padding:10px 12px} #reset {margin:12px 0}
 summary {cursor:pointer;font-weight:600;padding:14px 0}details {margin-top:8px}
-.explanation,.supporting,.evidence {padding:20px;margin:18px 0}.error {color:#a72532}
+.explanation,.supporting,.evidence {padding:20px;margin:18px 0}.error {color:var(--danger)}
 .contributions {display:grid;gap:10px;margin:20px 0}.contribution {display:grid;grid-template-columns:115px minmax(0,1fr) 95px;gap:10px;align-items:center}
-.track {background:#e3eaee;border-radius:4px;height:14px;overflow:hidden}.fill {height:100%;background:#007782}.fill.loss {background:#b23745}
-#status {color:#526471}#greeks {line-height:1.8}.curve {min-width:0}.curve svg {min-width:0}.metrics .panel {padding:16px}
+.track {background:#eae3d6;border-radius:4px;height:14px;overflow:hidden}.fill {height:100%;background:var(--accent)}.fill.loss {background:var(--danger)}
+#status {color:var(--muted)}#greeks {line-height:1.8}.curve {min-width:0}.curve svg {min-width:0}.metrics .panel {padding:16px}
 @media(max-width:860px){.workspace {grid-template-columns:1fr}.metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.question {font-size:24px}.metric strong{font-size:23px}.shell {padding:16px}.contribution {grid-template-columns:95px minmax(0,1fr) 80px}.curve text{font-size:11px}}
 @media(max-width:860px){.metric strong{font-size:18px}}
 @media(max-width:360px){.metrics{grid-template-columns:1fr}}
 @media(max-width:860px){.metrics{padding:0}}
+
+/* The author bar: who built the demo and how to reach him, on every screen (2026-11-07). */
+.author-bar {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 16px;padding:8px max(16px, calc((100% - 1180px) / 2));background:#1c1914;color:#f2e9d8;font-size:13px;line-height:1.5}
+.author-bar a {color:inherit;text-decoration:none}
+.author-bar a:hover,.author-bar a:focus-visible {text-decoration:underline;text-underline-offset:3px}
+.author-bar .author {font-weight:600}
+.author-bar .author span {color:#c2b59f;font-weight:400}
+.author-bar nav {display:flex;flex-wrap:wrap;gap:2px 14px;line-height:1.5}
+.author-bar nav a:last-child {color:#a9c69a;font-weight:600}
